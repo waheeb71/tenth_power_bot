@@ -1,4 +1,3 @@
-# app.py
 import os
 import logging
 import asyncio
@@ -27,22 +26,17 @@ def setup_handlers(app: Application):
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CallbackQueryHandler(button_handler))
     app.add_handler(CommandHandler("reply", reply_command))
-
-    # رسائل زر "📲 إظهار القائمة"
     app.add_handler(MessageHandler(filters.Regex("^📲 إظهار القائمة$"), handle_reply_buttons))
-
-    # باقي الرسائل النصية
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, message_handler))
 
 
 # ======== Webhook endpoint ========
-
 @flask_app.route(f"/webhook/{TELEGRAM_TOKEN}", methods=["POST"])
 def webhook():
     update = Update.de_json(request.get_json(), ptb_app.bot)
-    # استخدام loop الحالي لتشغيل process_update بشكل آمن
     asyncio.get_event_loop().create_task(ptb_app.process_update(update))
     return "OK", 200
+
 
 @flask_app.route("/")
 def index():
@@ -50,33 +44,28 @@ def index():
 
 
 # ======== Main ========
-# ======== Main ========
 if __name__ == "__main__":
-
-    # إنشاء تطبيق Telegram
     ptb_app = ApplicationBuilder().token(TELEGRAM_TOKEN).build()
     setup_handlers(ptb_app)
 
-    # تهيئة التطبيق مرة واحدة قبل Webhook أو Polling
-    async def init_bot():
+    async def main():
+        # تهيئة البوت
         await ptb_app.initialize()
         await ptb_app.start()
 
-    asyncio.run(init_bot())
+        if WEBHOOK_URL:
+            # ضبط Webhook
+            await ptb_app.bot.set_webhook(url=f"{WEBHOOK_URL}/webhook/{TELEGRAM_TOKEN}")
+            logger.info(f"Webhook set to {WEBHOOK_URL}/webhook/{TELEGRAM_TOKEN}")
 
-    # تشغيل Webhook أو Polling حسب الإعداد
-    if WEBHOOK_URL:
-        # ضبط Webhook
-        asyncio.run(ptb_app.bot.set_webhook(url=f"{WEBHOOK_URL}/webhook/{TELEGRAM_TOKEN}"))
-        logger.info(f"Webhook set to {WEBHOOK_URL}/webhook/{TELEGRAM_TOKEN}")
+            # تشغيل Flask
+            port = int(os.environ.get("PORT", 10000))
+            logger.info(f"Starting Flask app on port {port}")
+            flask_app.run(host="0.0.0.0", port=port, debug=False, use_reloader=False)
+        else:
+            # تشغيل Polling مباشرة
+            logger.info("No WEBHOOK_URL set. Running in polling mode.")
+            await ptb_app.run_polling()
 
-        # تشغيل Flask
-        port = int(os.environ.get("PORT", 10000))
-        logger.info(f"Starting Flask app on port {port}")
-        flask_app.run(host="0.0.0.0", port=port, debug=False, use_reloader=False)
-    else:
-        # إذا لم يكن Webhook محدد، شغّل Polling مباشر
-        logger.info("No WEBHOOK_URL set. Running in polling mode.")
-        # استخدم run_polling مباشرة بدون asyncio.run متكرر
-        ptb_app.run_polling()
-
+    # تشغيل loop واحد لكل العمليات async
+    asyncio.run(main())
