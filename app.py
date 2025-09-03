@@ -40,25 +40,29 @@ def setup_handlers(app: Application):
 @flask_app.route(f"/webhook/{TELEGRAM_TOKEN}", methods=["POST"])
 def webhook():
     update = Update.de_json(request.get_json(), ptb_app.bot)
-    asyncio.create_task(ptb_app.process_update(update))
+    # استخدام loop الحالي لتشغيل process_update بشكل آمن
+    asyncio.get_event_loop().create_task(ptb_app.process_update(update))
     return "OK", 200
+
 @flask_app.route("/")
 def index():
     return "TENTH POWER BOT is Running!", 200
 
 
 # ======== Main ========
+# ======== Main ========
 if __name__ == "__main__":
-    
-
-
 
     # إنشاء تطبيق Telegram
     ptb_app = ApplicationBuilder().token(TELEGRAM_TOKEN).build()
     setup_handlers(ptb_app)
-    # تهيئة التطبيق قبل Webhook
-    asyncio.run(ptb_app.initialize())
-    asyncio.run(ptb_app.start())
+
+    # تهيئة التطبيق مرة واحدة قبل Webhook أو Polling
+    async def init_bot():
+        await ptb_app.initialize()
+        await ptb_app.start()
+
+    asyncio.run(init_bot())
 
     # تشغيل Webhook أو Polling حسب الإعداد
     if WEBHOOK_URL:
@@ -73,4 +77,6 @@ if __name__ == "__main__":
     else:
         # إذا لم يكن Webhook محدد، شغّل Polling مباشر
         logger.info("No WEBHOOK_URL set. Running in polling mode.")
-        asyncio.run(ptb_app.run_polling())
+        # استخدم run_polling مباشرة بدون asyncio.run متكرر
+        ptb_app.run_polling()
+
