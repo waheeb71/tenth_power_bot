@@ -14,7 +14,8 @@ def main_menu():
         [InlineKeyboardButton("💬 استشارة فنية", callback_data="consult")],
         [InlineKeyboardButton("📩 إرسال رسالة للمشرف", callback_data="send_admin")],
         [InlineKeyboardButton("تابعنا على السوشيال", callback_data="social")],  # الزر الجديد
-        [InlineKeyboardButton("الموقع الإلكتروني", url="https://stunning-bubblegum-f108c3.netlify.app/")],  # الزر الجديد
+        [InlineKeyboardButton("الموقع الإلكتروني", url="https://stunning-bubblegum-f108c3.netlify.app/")],
+        [InlineKeyboardButton("رجوع", callback_data="📲 إظهار القائمة")],  # الزر الجديد
     ]
     return InlineKeyboardMarkup(keyboard)
 
@@ -30,6 +31,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"مرحبًا بك في {COMPANY_NAME}!\n"
         "نقدم حلولًا متكاملة في الزجاج، الألمنيوم، والمقاولات العامة.\n"
         "اضغط الزر أدناه لعرض القائمة 👇",
+        
         reply_markup=main_menu_reply()
     )
 
