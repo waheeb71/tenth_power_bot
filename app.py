@@ -78,7 +78,7 @@ if __name__ == "__main__":
     # تشغيل التطبيق
     ptb_loop.run_until_complete(ptb_app.initialize())
     ptb_loop.run_until_complete(ptb_app.start())
-    ptb_loop.run_until_complete(ptb_app.updater.start())  # ✅ مهم لتشغيل المعالجة
+     # ✅ مهم لتشغيل المعالجة
 
     # تعيين Webhook
     if os.getenv("WEBHOOK_URL"):
