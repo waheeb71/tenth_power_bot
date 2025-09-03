@@ -1,4 +1,4 @@
 python-telegram-bot[asyncio]==22.3
-Flask<2.3
+Flask>=3.0.2
 requests~=2.31.0
 quart==0.19.3
