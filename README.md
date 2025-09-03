@@ -1,7 +1,7 @@
 # 🤖 Business Assistant Bot
 
 <div align="center">
-  <img src="https://img.icons8.com/color/96/000000/chatbot.png" alt="Business Bot Logo" width="100"/>
+
   <h3>بوت تلجرام ذكي لإدارة العملاء وخدمة العملاء الآلية</h3>
   <p>مدعوم بـ <strong>Google Gemini</strong> | مثالي للشركات، المقاولين، والخدمات الفنية</p>
 
