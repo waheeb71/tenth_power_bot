@@ -36,12 +36,12 @@ def setup_handlers(app: Application):
 
 
 # ======== Webhook endpoint ========
+
 @flask_app.route(f"/webhook/{TELEGRAM_TOKEN}", methods=["POST"])
 def webhook():
     update = Update.de_json(request.get_json(), ptb_app.bot)
-    asyncio.run(ptb_app.process_update(update))
+    asyncio.create_task(ptb_app.process_update(update))
     return "OK", 200
-
 @flask_app.route("/")
 def index():
     return "TENTH POWER BOT is Running!", 200
@@ -49,9 +49,16 @@ def index():
 
 # ======== Main ========
 if __name__ == "__main__":
+    
+
+
+
     # إنشاء تطبيق Telegram
     ptb_app = ApplicationBuilder().token(TELEGRAM_TOKEN).build()
     setup_handlers(ptb_app)
+    # تهيئة التطبيق قبل Webhook
+    asyncio.run(ptb_app.initialize())
+    asyncio.run(ptb_app.start())
 
     # تشغيل Webhook أو Polling حسب الإعداد
     if WEBHOOK_URL:
