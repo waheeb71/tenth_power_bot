@@ -48,13 +48,21 @@ def setup_handlers(app: Application):
 
 
 # Route للويبهوك
+
 @flask_app.route(f"/webhook/{os.getenv('TELEGRAM_TOKEN')}", methods=["POST"])
 def webhook():
-    update = Update.de_json(request.get_json(), ptb_application.bot)
+    data = request.get_json(force=True)
+    update = Update.de_json(data, ptb_application.bot)
+
+    # Debug log
+    print("📩 Received update:", update.to_dict())
+
+    # مرر التحديث للـ Application
     asyncio.run_coroutine_threadsafe(
-        ptb_application.process_update(update),
-        ptb_loop
-    )
+      ptb_application.process_update(update),
+      ptb_loop   # ✅ استخدم ptb_loop مش ptb_event_loop
+)
+
     return "OK", 200
 
 
