@@ -1,4 +1,3 @@
-# app.py
 import os
 import logging
 import asyncio
@@ -18,7 +17,7 @@ from handlers import start, button_handler, message_handler, reply_command, hand
 # إعداد اللوجات
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-global ptb_application, ptb_loop
+
 # Flask app
 flask_app = Flask(__name__)
 
@@ -29,26 +28,20 @@ ptb_loop: asyncio.AbstractEventLoop = None
 
 # إعداد الهاندلرز
 def setup_handlers(app: Application):
-    # أوامر أساسية
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("reply", reply_command))
-
-    # أزرار
     app.add_handler(CallbackQueryHandler(button_handler))
     app.add_handler(MessageHandler(filters.Regex("^📲 إظهار القائمة$"), handle_reply_buttons))
-
-    # رسائل عامة
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, message_handler))
 
-    # لوج لكل تحديث (للتأكد من الاستقبال)
+    # Debug لكل تحديث
     async def log_all(update: Update, context):
-        logger.info(f"📩 Received update: {update}")
+        logger.info(f"📩 Received update: {update.to_dict()}")
 
     app.add_handler(MessageHandler(filters.ALL, log_all))
 
 
 # Route للويبهوك
-
 @flask_app.route(f"/webhook/{os.getenv('TELEGRAM_TOKEN')}", methods=["POST"])
 def webhook():
     data = request.get_json(force=True)
@@ -59,10 +52,9 @@ def webhook():
 
     # مرر التحديث للـ Application
     asyncio.run_coroutine_threadsafe(
-      ptb_application.process_update(update),
-      ptb_loop   # ✅ استخدم ptb_loop مش ptb_event_loop
-)
-
+        ptb_application.process_update(update),
+        ptb_loop   # ✅ استخدم ptb_loop
+    )
     return "OK", 200
 
 
@@ -76,7 +68,6 @@ if __name__ == "__main__":
     ptb_app = ApplicationBuilder().token(os.getenv("TELEGRAM_TOKEN")).build()
     setup_handlers(ptb_app)
 
-    
     ptb_application = ptb_app
 
     # إنشاء event loop خاص
@@ -86,7 +77,6 @@ if __name__ == "__main__":
     # تشغيل التطبيق
     ptb_loop.run_until_complete(ptb_app.initialize())
     ptb_loop.run_until_complete(ptb_app.start())
-     # ✅ مهم لتشغيل المعالجة
 
     # تعيين Webhook
     if os.getenv("WEBHOOK_URL"):
