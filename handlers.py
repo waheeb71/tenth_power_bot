@@ -2,10 +2,9 @@
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, KeyboardButton, ReplyKeyboardMarkup
 from telegram.ext import ContextTypes, CommandHandler, MessageHandler, filters, CallbackQueryHandler
 from ai_handler import get_ai_response
-from config import COMPANY_NAME, CONTACT_PHONE, CONTACT_EMAIL, CONTACT_LOCATION, SERVICES, ADMIN_IDS,FACEBOOK_URL,INSTAGRAM_URL,TELEGRAM_URL,WHATSAPP_URL,SNAPCHAT_URL,TIKTOK_URL,WEBSITE_URL
+from config import COMPANY_NAME, CONTACT_PHONE, CONTACT_EMAIL, CONTACT_LOCATION, SERVICES, ADMIN_IDS, FACEBOOK_URL, INSTAGRAM_URL, TELEGRAM_URL, WHATSAPP_URL, SNAPCHAT_URL, TIKTOK_URL, WEBSITE_URL
 
-
-user_messages = {}  
+user_messages = {}
 
 def main_menu():
     keyboard = [
@@ -13,36 +12,17 @@ def main_menu():
         [InlineKeyboardButton("📞 اتصل بنا", callback_data="contact")],
         [InlineKeyboardButton("💬 استشارة فنية", callback_data="consult")],
         [InlineKeyboardButton("📩 إرسال رسالة للمشرف", callback_data="send_admin")],
-        [InlineKeyboardButton("تابعنا على السوشيال", callback_data="social")],  # الزر الجديد
-        [InlineKeyboardButton("الموقع الإلكتروني", url="https://stunning-bubblegum-f108c3.netlify.app/")],
-        [InlineKeyboardButton("رجوع", callback_data="📲 إظهار القائمة")],  # الزر الجديد
+        [InlineKeyboardButton("تابعنا على السوشيال", callback_data="social")],
+        [InlineKeyboardButton("الموقع الإلكتروني", url=WEBSITE_URL)],
+        [InlineKeyboardButton("رجوع", callback_data="back_to_menu")],
     ]
     return InlineKeyboardMarkup(keyboard)
 
 def main_menu_reply():
-    keyboard = [
-        [KeyboardButton("📲 إظهار القائمة")]
-    ]
-    return ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
+    keyboard = [[KeyboardButton("📲 إظهار القائمة")]]
+    return ReplyKeyboardMarkup(keyboard, resize_keyboard=True, one_time_keyboard=False)
 
-
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text(
-        f"مرحبًا بك في {COMPANY_NAME}!\n"
-        "نقدم حلولًا متكاملة في الزجاج، الألمنيوم، والمقاولات العامة.\n"
-        "اضغط الزر أدناه لعرض القائمة 👇",
-        
-        reply_markup=main_menu_reply()
-    )
-
-
-# التعامل مع زر "📲 إظهار القائمة"
-async def handle_reply_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if update.message.text == "📲 إظهار القائمة":
-        await update.message.reply_text(
-            "اختر من القائمة:",
-            reply_markup=main_menu()
-        )
+# تعريف social_menu مسبقًا
 social_buttons = [
     [InlineKeyboardButton("فيسبوك", url=FACEBOOK_URL)],
     [InlineKeyboardButton("إنستغرام", url=INSTAGRAM_URL)],
@@ -52,8 +32,22 @@ social_buttons = [
     [InlineKeyboardButton("تيك توك", url=TIKTOK_URL)],
     [InlineKeyboardButton("الموقع الإلكتروني", url=WEBSITE_URL)],
 ]
-
 social_menu = InlineKeyboardMarkup(social_buttons)
+
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text(
+        f"مرحبًا بك في {COMPANY_NAME}!\n"
+        "نقدم حلولًا متكاملة في الزجاج، الألمنيوم، والمقاولات العامة.\n"
+        "اضغط الزر أدناه لعرض القائمة 👇",
+        reply_markup=main_menu_reply()
+    )
+
+async def handle_reply_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if update.message.text == "📲 إظهار القائمة":
+        await update.message.reply_text(
+            "اختر من القائمة:",
+            reply_markup=main_menu()
+        )
 
 async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
@@ -65,7 +59,6 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"🔹 خدماتنا:\n{services_list}\n\nنضمن الجودة، الموثوقية، والابتكار في كل مشروع.",
             reply_markup=main_menu()
         )
-
     elif query.data == "contact":
         await query.edit_message_text(
             f"📞 الهاتف: {CONTACT_PHONE}\n"
@@ -76,28 +69,26 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
     elif query.data == "social":
         await query.edit_message_text(
-        "تابعنا على مواقع التواصل الاجتماعي:",
-        reply_markup=social_menu
-     )
+            "تابعنا على مواقع التواصل الاجتماعي:",
+            reply_markup=social_menu
+        )
     elif query.data == "consult":
         await query.edit_message_text(
             "اكتب سؤالك أو استفسارك، وسأجيبك فورًا باستخدام الذكاء الاصطناعي.",
             reply_markup=InlineKeyboardMarkup([[
-                InlineKeyboardButton("🔙 العودة", callback_data="back")
+                InlineKeyboardButton("🔙 العودة", callback_data="back_to_menu")
             ]])
         )
         context.user_data['awaiting_ai_query'] = True
-
     elif query.data == "send_admin":
         await query.edit_message_text(
             "اكتب رسالتك للمشرفين وسيتم الرد عليك قريبًا.",
             reply_markup=InlineKeyboardMarkup([[
-                InlineKeyboardButton("🔙 العودة", callback_data="back")
+                InlineKeyboardButton("🔙 العودة", callback_data="back_to_menu")
             ]])
         )
         context.user_data['awaiting_admin_msg'] = True
-
-    elif query.data == "back":
+    elif query.data == "back_to_menu":
         await query.edit_message_text("اختر من القائمة:", reply_markup=main_menu())
 
 async def message_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -132,6 +123,7 @@ async def message_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         del context.user_data['awaiting_admin_msg']
         return
 
+    # الرد العام بالذكاء الاصطناعي
     response = get_ai_response(text)
     await update.message.reply_text(response)
 
@@ -164,3 +156,11 @@ async def reply_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("✅ تم إرسال الرد بنجاح!")
     except Exception as e:
         await update.message.reply_text(f"فشل الإرسال: {str(e)}")
+
+# دالة لتسجيل جميع المعالجات (تُستخدم في app.py)
+def setup_handlers(application):
+    application.add_handler(CommandHandler("start", start))
+    application.add_handler(CallbackQueryHandler(button_handler))
+    application.add_handler(MessageHandler(filters.Regex("^📲 إظهار القائمة$"), handle_reply_buttons))
+    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, message_handler))
+    application.add_handler(CommandHandler("reply", reply_command))
