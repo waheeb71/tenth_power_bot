@@ -56,32 +56,13 @@ def index():
     return "TENTH POWER BOT is Running!", 200
 
 if __name__ == "__main__":
-   
     ptb_app = ApplicationBuilder().token(os.getenv("TELEGRAM_TOKEN")).build()
     setup_handlers(ptb_app)
- 
     ptb_application = ptb_app
 
-    ptb_event_loop = asyncio.new_event_loop()
-    ptb_thread = Thread(target=run_ptb_in_thread, args=(ptb_app, ptb_event_loop), name="PTBThread")
-    ptb_thread.daemon = True
-    ptb_thread.start()
-    logger.info("PTB thread started.")
+    loop = asyncio.new_event_loop()
+    loop.run_until_complete(ptb_app.bot.set_webhook(url=f"{os.getenv('WEBHOOK_URL')}/webhook/{os.getenv('TELEGRAM_TOKEN')}"))
+    loop.close()
 
-    if os.getenv("WEBHOOK_URL"):
-        loop = asyncio.new_event_loop()
-        loop.run_until_complete(ptb_app.bot.set_webhook(url=f"{os.getenv('WEBHOOK_URL')}/webhook/{os.getenv('TELEGRAM_TOKEN')}"))
-        loop.close()
-        logger.info(f"Webhook set to {os.getenv('WEBHOOK_URL')}/webhook/{os.getenv('TELEGRAM_TOKEN')}")
-
-        port = int(os.environ.get("PORT", 10000))
-        logger.info(f"Starting Flask app on port {port}")
-        flask_app.run(host="0.0.0.0", port=port, debug=False, use_reloader=False)
-    else:
-        logger.info("No WEBHOOK_URL set. Running in polling mode.")
-        asyncio.run(ptb_app.run_polling())
-
-    if ptb_event_loop.is_running():
-        ptb_event_loop.call_soon_threadsafe(ptb_event_loop.stop)
-    ptb_thread.join()
-    logger.info("Application shutdown complete.")
+    port = int(os.environ.get("PORT", 10000))
+    flask_app.run(host="0.0.0.0", port=port, debug=False, use_reloader=False)
