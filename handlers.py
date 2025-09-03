@@ -3,7 +3,7 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, Keyboar
 from telegram.ext import ContextTypes, CommandHandler, MessageHandler, filters, CallbackQueryHandler
 from ai_handler import get_ai_response
 from config import COMPANY_NAME, CONTACT_PHONE, CONTACT_EMAIL, CONTACT_LOCATION, SERVICES, ADMIN_IDS, FACEBOOK_URL, INSTAGRAM_URL, TELEGRAM_URL, WHATSAPP_URL, SNAPCHAT_URL, TIKTOK_URL, WEBSITE_URL
-
+import asyncio
 user_messages = {}
 
 def main_menu():
