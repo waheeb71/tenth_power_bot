@@ -47,7 +47,7 @@ def webhook():
     update = Update.de_json(request.get_json(), ptb_application.bot)
     asyncio.run_coroutine_threadsafe(
         ptb_application.process_update(update),
-        ptb_application.bot.loop
+        ptb_application.loop   # ✅ استخدم loop من Application
     )
     return "OK", 200
 
