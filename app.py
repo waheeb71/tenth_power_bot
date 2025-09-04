@@ -13,7 +13,7 @@ from telegram.ext import (
     Application
 )
 
-from handlers import start, button_handler, message_handler, reply_command, handle_reply_buttons
+from handlers import start, button_handler, message_handler, handle_reply_buttons
 
 # إعداد اللوجات
 logging.basicConfig(level=logging.INFO)
