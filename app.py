@@ -62,15 +62,31 @@ def webhook():
 def index():
     return "TENTH POWER BOT is Running!", 200
 
+
 if __name__ == "__main__":
     # إنشاء التطبيق
     ptb_app = ApplicationBuilder().token(os.getenv("TELEGRAM_TOKEN")).build()
     setup_handlers(ptb_app)
 
-    # هاندلر اختبار (echo)
-    async def echo(update: Update, context):
-        await update.message.reply_text(f"👋 انت قلت: {update.message.text}")
-
-    ptb_app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))
-
     ptb_application = ptb_app
+
+    # إنشاء event loop خاص
+    ptb_loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(ptb_loop)
+
+    # تشغيل التطبيق
+    ptb_loop.run_until_complete(ptb_app.initialize())
+    ptb_loop.run_until_complete(ptb_app.start())
+
+    # تعيين Webhook
+    if os.getenv("WEBHOOK_URL"):
+        webhook_url = f"{os.getenv('WEBHOOK_URL')}/webhook/{os.getenv('TELEGRAM_TOKEN')}"
+        ptb_loop.run_until_complete(ptb_app.bot.set_webhook(url=webhook_url))
+        logger.info(f"✅ Webhook set to {webhook_url}")
+
+        # تشغيل Flask
+        port = int(os.environ.get("PORT", 10000))
+        logger.info(f"🚀 Starting Flask app on port {port}")
+        flask_app.run(host="0.0.0.0", port=port, debug=False, use_reloader=False)
+    else:
+        logger.error("⚠️ يجب تحديد WEBHOOK_URL في الـ Environment variables")
