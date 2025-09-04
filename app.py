@@ -31,7 +31,7 @@ main_event_loop: asyncio.AbstractEventLoop = None
 def setup_handlers(app: Application):
     """إعداد جميع المعالجات (handlers) للبوت."""
     app.add_handler(CommandHandler("start", start))
-    app.add_handler(CommandHandler("reply", reply_command))
+    
     app.add_handler(CallbackQueryHandler(button_handler))
     app.add_handler(MessageHandler(filters.Regex("^📲 إظهار القائمة$"), handle_reply_buttons))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, message_handler))
