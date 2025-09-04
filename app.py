@@ -52,11 +52,17 @@ def webhook():
 
     # مرر التحديث للـ Application
     asyncio.run_coroutine_threadsafe(
-        ptb_application.process_update(update),
+       # ptb_application.process_update(update),
+        ptb_application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo)),
+
         ptb_loop   # ✅ استخدم ptb_loop
     )
     return "OK", 200
 
+async def echo(update: Update, context):
+    await update.message.reply_text(f"👋 انت قلت: {update.message.text}")
+
+ptb_application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))
 
 @flask_app.route("/")
 def index():
