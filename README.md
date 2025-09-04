@@ -162,12 +162,21 @@ python app.py
 
 ---
 
-## 📎 هل ترغب أن أُرفق ملفات إضافية؟
 
-- ✅ `.gitignore`
-- ✅ `Procfile` لـ Render
-- ✅ `runtime.txt` لتحديد إصدار Python
-- ✅ نموذج `config.py` بتعليقات توضيحية
 
-أرسل "نعم"، وسأرسلها لك فورًا.
 
+##  Contact:
+For questions or support, contact me via:
+- Telegram: [@SyberSc71](https://t.me/SyberSc71)
+- Telegram: [@WAT4F](https://t.me/WAT4F)
+- GitHub: [waheeb71](https://github.com/waheeb71)
+- GitHub2: [cyberlangdev](https://github.com/cyberlangdev)
+- **Location:** I am from Yemen, Taiz.
+- **YouTube Channel:** [Cyber Code](https://www.youtube.com/@cyber_code1)
+- **X (formerly Twitter):** [@wa__cys](https://x.com/wa__cys)
+
+---
+## Author / المطور
+
+**English:** Waheeb Mahyoob Al-Sharabi (Waheeb Al-Sharabi)  
+**العربية:** وهيب مهيوب الشرعبي (وهيب الشرعبي )
